@@ -22,6 +22,28 @@ namespace E_Market1._1.Controllers
             return View(products.ToList());
         }
 
+        public JsonResult GetGategoryName(string term)
+        {
+            List<string> allCategory;
+            allCategory = db.Categories.Where(x => x.name.ToLower().StartsWith(term.ToLower())).Select(y => y.name).ToList();
+            return Json(allCategory, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult Index(string searchTerm)
+        {
+            List<Product> products;
+            if(string.IsNullOrEmpty(searchTerm))
+            {
+                products = db.Products.Include(u => u.Category).ToList();
+            }
+            else
+            {
+                products = db.Products.Include(u => u.Category).Where(a => a.Category.name.ToLower().StartsWith(searchTerm.ToLower())).ToList();
+            }
+            return View(products);
+        }
+
         // GET: Products/Details/5
         public ActionResult Details(int? id)
         {
@@ -140,6 +162,8 @@ namespace E_Market1._1.Controllers
             return RedirectToAction("Index");
         }
 
+
+        
         protected override void Dispose(bool disposing)
         {
             if (disposing)
